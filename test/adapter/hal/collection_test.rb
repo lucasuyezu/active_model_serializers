@@ -25,70 +25,60 @@ module ActiveModel
           end
 
           def test_include_multiple_posts
-            expected = [
-              {
-                id: "1",
-                type: "posts",
-                attributes: {
-                  title: "Hello!!",
-                  body: "Hello, world!!"
-                },
-                relationships: {
-                  comments: { data: [] },
-                  blog: { data: { type: "blogs", id: "999" } },
-                  author: { data: { type: "authors", id: "1" } }
-                }
+            expected = {
+              _links: {
+                self: { href: "/posts" },
+                find: { href: "/posts{?id}", templated: true }
               },
-              {
-                id: "2",
-                type: "posts",
-                attributes: {
-                  title: "New Post",
-                  body: "Body"
+              posts: [{
+                _links: {
+                  self: { href: "/posts/1" },
+                  blog: { href: "/blogs/999" },
+                  author: { href: "/authors/1" }
                 },
-                relationships: {
-                  comments: { data: [] },
-                  blog: { data: { type: "blogs", id: "999" } },
-                  author: { data: { type: "authors", id: "1" } }
-                }
-              }
-            ]
+                title: "Hello!!",
+                body: "Hello, world!!"
+              }, {
+                _links: {
+                  self: { href: "/posts/2" },
+                  blog: { href: "/blogs/999" },
+                  author: { href: "/authors/1" }
+                },
+                title: "New Post",
+                body: "Body"
+              }]
+            }
 
-            assert_equal(expected, @adapter.serializable_hash[:data])
+            assert_equal(expected, @adapter.serializable_hash)
           end
 
           def test_limiting_fields
             @adapter = ActiveModel::Serializer::Adapter::Hal.new(@serializer, fields: ['title'])
 
-            expected = [
-              {
-                id: "1",
-                type: "posts",
-                attributes: {
-                  title: "Hello!!"
-                },
-                relationships: {
-                  comments: { data: [] },
-                  blog: { data: { type: "blogs", id: "999" } },
-                  author: { data: { type: "authors", id: "1" } }
-                }
+            expected = {
+              _links: {
+                self: { href: "/posts" },
+                find: { href: "/posts{?id}", templated: true }
               },
-              {
-                id: "2",
-                type: "posts",
-                attributes: {
-                  title: "New Post"
+              posts: [{
+                _links: {
+                  self: { href: "/posts/1" },
+                  blog: { href: "/blogs/999" },
+                  author: { href: "/authors/1" }
                 },
-                relationships: {
-                  comments: { data: [] },
-                  blog: { data: { type: "blogs", id: "999" } },
-                  author: { data: { type: "authors", id: "1" } }
-                }
-              }
-            ]
-            assert_equal(expected, @adapter.serializable_hash[:data])
-          end
+                title: "Hello!!"
+              }, {
+                _links: {
+                  self: { href: "/posts/2" },
+                  blog: { href: "/blogs/999" },
+                  author: { href: "/authors/1" }
+                },
+                title: "New Post"
+              }]
+            }
 
+            assert_equal(expected, @adapter.serializable_hash)
+          end
         end
       end
     end
